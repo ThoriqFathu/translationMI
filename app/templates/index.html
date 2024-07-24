@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Translation</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <style>
+        .box-saran {
+            display: none; /* Awalnya disembunyikan */
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+            width: 100%; /* Menggunakan lebar penuh kontainer Bootstrap */
+            position: relative; /* Memungkinkan positioning untuk loading spinner */
+        }
+
+        .loading {
+            display: none; /* Awalnya disembunyikan */
+            font-size: 20px;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            margin: 0 auto;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        li:hover {
+            cursor: pointer;
+            background: gray;
+        }
+        .box-hasil {
+            /* border: 1px solid #ccc; */
+            padding-top: 20px;
+            padding-bottom: 20px;
+            border-radius: 8px;
+            /* background: #f9f9f9; */
+            /* height: 100%; */
+            min-height: 100px;
+        }
+
+        .hasil-content {
+            /* height: 100%; */
+            margin-top: 10px;
+            height: 130px;
+            max-height: 130px; /* Sesuaikan dengan ukuran form */
+            overflow-y: auto; /* Scrollbar muncul jika teks melebihi batas */
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #fff;
+        }
+
+        .hasil-content p {
+            margin: 0;
+        }
+        /* .box-detils {
+            min-height: 150px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+            width: 100%; 
+            position: relative; 
+        } */
+        .box-detils {
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+        .box-header {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        .box-header:hover {
+            background-color: #e9e7e7;
+        }
+        .box-header h4 {
+            margin: 0;
+            flex-grow: 1;
+        }
+        .arrow-icon {
+            transition: transform 0.3s;
+        }
+        .arrow-icon.collapsed {
+            transform: rotate(90deg);
+        }
+        .tabel-description {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .tabel-description th,
+        .tabel-description td {
+            text-align: center;
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+        .content-detils, .ambigous-detils {
+            border: 1px solid #ddd;
+            padding: 3px;
+        }
+    </style>
+    <script>
+        function insertChar(char) {
+            var textarea = document.getElementById("inputText");
+            var startPos = textarea.selectionStart;
+            var endPos = textarea.selectionEnd;
+            textarea.value = textarea.value.substring(0, startPos) + char + textarea.value.substring(endPos, textarea.value.length);
+            textarea.selectionStart = startPos + char.length;
+            textarea.selectionEnd = startPos + char.length;
+            textarea.focus();
+        }
+    </script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Natural Language Processing - NLP</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                <ul class="navbar-nav ml-auto"> <!-- Add ml-auto here -->
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">Translate</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">About</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container mt-4">
+        <h1 class="mb-4">Madurese-Indonesian Translation</h1>
+        <div class="row">
+            <div class="col-sm-6">
+                <form action="/submit" method="post">
+                    <div class="form-group">
+                        <div class="btn-group mb-3" role="group">
+                            <button type="button" class="btn btn-secondary mr-2" onclick="insertChar('â')">â</button>
+                            <button type="button" class="btn btn-secondary mr-2" onclick="insertChar('è')">è</button>
+                            <button type="button" class="btn btn-secondary mr-2" onclick="insertChar('ḍ')">ḍ</button>
+                            <button type="button" class="btn btn-secondary" onclick="insertChar('ṭ')">ṭ</button>
+                        </div>
+                        <p style="float: right;margin-top: 12px;"><strong>Madurese</strong></p>
+                        <textarea rows="5" id="inputText" name="inputText" class="form-control" placeholder="Enter text here...">{{user_input}}</textarea>
+                    </div>
+                    <!-- <button id="correctButton" class="btn btn-primary">Translate</button> -->
+                </form>
+                <div class="box-saran mt-4">
+                    <h5>Correction Suggestion:</h5>
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Loading...
+                    </div>
+                    <ul id="results"></ul>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <!-- buatkan tampilan hasil terjemahan seperti google translete -->
+                <p style="float: left; margin-top: 12px;"><strong>Indonesian</strong></p>
+                <div class="box-hasil mt-4">
+                    <div class="hasil-content">
+                    <!-- {% if hasil %}
+                        <p class="text-translate">{{hasil}}</p>
+                        {% endif %} -->
+                        <p class="text-translate"></p>
+                    </div>
+                </div>
+                <div class="box-detils">
+                    <div class="box-header" onclick="toggleDetails()">
+                        <h4>Details</h4>
+                        <span class="arrow-icon">▶</span>
+                    </div>
+                    <div class="box-content" style="display: none;">
+                        <table class="tabel-description">
+                            <tr>
+                                <th colspan="2" class="text-center">Color Description</th>
+                            </tr>
+                            <tr>
+                                <th>Color</th>
+                                <th>Description</th>
+                            </tr>
+                            <tr>
+                                <td style="background-color: blue;"></td>
+                                <td>Not Ambigu</td>
+                            </tr>
+                            <tr>
+                                <td style="background-color: orange;"></td>
+                                <td>Location</td>
+                            </tr>
+                            <tr>
+                                <td style="background-color: green;"></td>
+                                <td>Ambigous</td>
+                            </tr>
+                            <tr>
+                                <td style="background-color: red;"></td>
+                                <td>Not in dictionary</td>
+                            </tr>
+                        </table>
+                        <div class="content-detils mt-3"></div>
+                        <div class="ambigous-detils"></div>
+                    </div>
+                </div>
+            </div>
+        </div>   
+        
+        
+    </div>
+
+    <script>
+        function toggleDetails() {
+            const content = document.querySelector('.box-content');
+            const icon = document.querySelector('.arrow-icon');
+            if (content.style.display === "none") {
+                content.style.display = "block";
+                icon.classList.remove('collapsed');
+            } else {
+                content.style.display = "none";
+                icon.classList.add('collapsed');
+            }
+        }
+    </script>
+</body>
+</html>
